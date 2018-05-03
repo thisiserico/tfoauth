@@ -14,22 +14,23 @@ import (
 )
 
 func landing(w http.ResponseWriter, r *http.Request) {
-	log.Println("serving landing")
+	log.Println("serving landing to user")
 
 	qs := url.Values{}
 	qs.Add("client_id", conf.ClientID)
 	qs.Add("redirect_uri", conf.RedirectURI)
-	qs.Add("scope", strings.Join(scopes, "+"))
+	qs.Add("scope", strings.Join(scopes, " "))
 
+	log.Println("providing link to authenticate against typeform")
 	url := fmt.Sprintf("%s/authorize?%s", conf.TypeformURL, qs.Encode())
-	body := `<body><a href="%s">authorize this app</a></body>`
+	body := `<body><a href="%s">authorize this app against typeform</a></body>`
 	body = fmt.Sprintf(body, url)
 
 	fmt.Fprint(w, body)
 }
 
 func callback(w http.ResponseWriter, r *http.Request) {
-	log.Println("running callback")
+	log.Println("processing callback from typeform")
 
 	form := url.Values{}
 	form.Add("code", r.URL.Query().Get("code"))
@@ -53,8 +54,12 @@ func callback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Println("oauth flow completed, token granted!")
 	w.Write(bodyBytes)
-	log.Println("oauth flow completed, token granted")
+}
+
+func modifyScopes(w http.ResponseWriter, r *http.Request) {
+	scopes = strings.Split(r.URL.Query().Get("scopes"), " ")
 }
 
 func sendFailure(w http.ResponseWriter, err error) {

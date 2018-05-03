@@ -36,6 +36,7 @@ func main() {
 	mux := goji.NewMux()
 	mux.HandleFunc(pat.Get("/"), landing)
 	mux.HandleFunc(pat.Get("/callback"), callback)
+	mux.HandleFunc(pat.Put("/modify-scopes"), modifyScopes)
 
 	log.Printf("serving requests in port %d", conf.HTTPPort)
 	http.ListenAndServe(fmt.Sprintf(":%d", conf.HTTPPort), mux)
