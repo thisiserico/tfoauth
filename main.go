@@ -35,6 +35,7 @@ func main() {
 
 	mux := goji.NewMux()
 	mux.HandleFunc(pat.Get("/"), landing)
+	mux.HandleFunc(pat.Get("/logo.png"), serveLogo)
 	mux.HandleFunc(pat.Get("/callback"), callback)
 	mux.HandleFunc(pat.Put("/modify-scopes"), modifyScopes)
 

@@ -13,6 +13,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+const logoPath = "logo.png"
+
 func landing(w http.ResponseWriter, r *http.Request) {
 	log.Println("serving landing to user")
 
@@ -60,6 +62,15 @@ func callback(w http.ResponseWriter, r *http.Request) {
 
 func modifyScopes(w http.ResponseWriter, r *http.Request) {
 	scopes = strings.Split(r.URL.Query().Get("scopes"), " ")
+}
+
+func serveLogo(w http.ResponseWriter, _ *http.Request) {
+	if data, err := ioutil.ReadFile(string(logoPath)); err == nil {
+		w.Write(data)
+		return
+	}
+
+	w.WriteHeader(http.StatusNotFound)
 }
 
 func sendFailure(w http.ResponseWriter, err error) {
