@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/kelseyhightower/envconfig"
 	goji "goji.io"
@@ -15,10 +16,6 @@ var (
 	scopes []string
 )
 
-func init() {
-	scopes = []string{"accounts:read"}
-}
-
 type config struct {
 	HTTPPort    int    `envconfig:"http_port" default:"8080"`
 	TypeformURL string `envconfig:"typeform_url" default:"https://api.typeform.com"`
@@ -26,12 +23,15 @@ type config struct {
 	ClientID     string `envconfig:"client_id" required:"true"`
 	ClientSecret string `envconfig:"client_secret" required:"true"`
 	RedirectURI  string `envconfig:"redirect_uri" required:"true"`
+	Scopes       string `envconfig:"scopes" required:"true"`
 }
 
 func main() {
 	if err := envconfig.Process("tfoauth", &conf); err != nil {
 		log.Fatal(err)
 	}
+
+	scopes = strings.Split(conf.Scopes, " ")
 
 	mux := goji.NewMux()
 	mux.HandleFunc(pat.Get("/"), landing)
